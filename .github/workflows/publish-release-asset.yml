@@ -1,0 +1,22 @@
+name: Publish OpenArena package
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download package from the game server
+        run: |
+          curl --fail --location --retry 5 --retry-all-errors \
+            --output openarena-0.8.8.zip \
+            http://106.52.6.21/downloads/openarena-0.8.8.zip
+          echo "5a8faf7f5b51f351b0a1618c06b6b98a5f1a6758f1d39818de2c87df2a0bac4a  openarena-0.8.8.zip" | sha256sum --check
+      - name: Upload release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload v0.8.8 openarena-0.8.8.zip --repo "$GITHUB_REPOSITORY" --clobber
